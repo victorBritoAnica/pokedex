@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../navigation/routes.dart';
+import '../viewmodels/pokemon_view_model.dart';
 import '../widgets/loading_indicator.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -15,21 +17,23 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        //este tipo de navegación elimina todo lo anterior de la pila de navegación y evita que se pueda hacer back
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          Routes.home,
-          (route) => false,
-        );
-      }
+      _loadData();
     });
+  }
+
+  /// Llama al ViewModel para cargar los Pokémon y navega cuando termine
+  Future<void> _loadData() async {
+    final viewModel = Provider.of<PokemonViewModel>(context, listen: false);
+    await viewModel.loadPokemons();
+
+    // Este tipo de navegación borra el screen de la pila
+    Navigator.pushNamedAndRemoveUntil(context, Routes.home, (route) => false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.redAccent,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
