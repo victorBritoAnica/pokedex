@@ -19,7 +19,13 @@ class PokemonViewModel extends ChangeNotifier {
     final result = await _pokemonService.getPokemons(offset, limit);
 
     if (result is Success<List<Pokemon>>) {
-      pokemons = result.data;
+      //evita que se agreguen al estado del arreglo pokemons repetidos
+      final newPokemons = result.data
+          .where(
+            (newP) => !pokemons.any((existingP) => existingP.id == newP.id),
+          )
+          .toList();
+      pokemons.addAll(newPokemons);
     } else if (result is Failure) {
       errorMessage = result.message;
     }
