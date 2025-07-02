@@ -44,7 +44,6 @@ class PokemonService {
         return Success(localResults);
       }
 
-      // Si no hay resultados locales, puedes hacer una búsqueda en API (opcional)
       return Success([]);
     } catch (e) {
       return Failure('Error al buscar Pokémon: $e');
