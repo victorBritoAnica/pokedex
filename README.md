@@ -45,6 +45,9 @@ Toca un Pokémon para ver su información detallada.
 La app almacena en caché los datos para acelerar cargas futuras y permitir uso offline.
 
 Estructura del proyecto
+
+/lib/navigation: Datos de navegación .
+
 /lib/models: Modelos de datos.
 
 /lib/services: Servicios API y base de datos.
@@ -124,6 +127,8 @@ Tap a Pokémon to see its detailed information.
 The app caches data to speed up future loads and allow for offline use.
 
 Project Structure
+/lib/navigation: Navigation data.
+ 
 /lib/models: Data models.
 
 /lib/services: API and database services.
