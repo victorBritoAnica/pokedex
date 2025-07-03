@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
-  /// Llama al ViewModel para cargar los Pokémon y navega cuando termine
+  /// Llama al ViewModel para cargar los Pokémon y navega hacia home
   Future<void> _loadData() async {
     final viewModel = Provider.of<PokemonViewModel>(context, listen: false);
     await viewModel.loadPokemons();
@@ -33,24 +33,32 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.redAccent,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 7,
-            child: Center(
-              child: Image.asset(
-                'assets/images/pokedex.png',
-                fit: BoxFit.contain,
-                width: double.infinity,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFb71c1c), Color(0xFF000000)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 7,
+              child: Center(
+                child: Image.asset(
+                  'assets/images/pokedex.png',
+                  fit: BoxFit.contain,
+                  width: MediaQuery.of(context).size.width * 0.8,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          const LoadingIndicator(),
-          const SizedBox(height: 40),
-        ],
+            const SizedBox(height: 20),
+            const LoadingIndicator(),
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
