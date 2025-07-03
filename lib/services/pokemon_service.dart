@@ -37,16 +37,11 @@ class PokemonService {
     }
   }
 
-  Future<Result<List<Pokemon>>> searchPokemons(String query) async {
+  Future<Result<Pokemon>> getPokemonDetail(int id) async {
     try {
-      final localResults = await dbService.searchPokemons(query);
-      if (localResults.isNotEmpty) {
-        return Success(localResults);
-      }
-
-      return Success([]);
+      return await apiService.fetchPokemonDetail(id);
     } catch (e) {
-      return Failure('Error al buscar Pokémon: $e');
+      return Failure('Error al obtener detalle del Pokémon: $e');
     }
   }
 }
