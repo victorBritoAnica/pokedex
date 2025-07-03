@@ -25,7 +25,6 @@ class PokemonService {
         for (final pokemon in pokemons) {
           await dbService.insertOrUpdatePokemon(pokemon);
         }
-
         return Success(pokemons);
       } else if (result is Failure) {
         return result; // Propaga el error
@@ -34,14 +33,6 @@ class PokemonService {
       return Failure('Respuesta desconocida al obtener los Pokémon');
     } catch (e) {
       return Failure('Error al obtener Pokémon: $e');
-    }
-  }
-
-  Future<Result<Pokemon>> getPokemonDetail(int id) async {
-    try {
-      return await apiService.fetchPokemonDetail(id);
-    } catch (e) {
-      return Failure('Error al obtener detalle del Pokémon: $e');
     }
   }
 }

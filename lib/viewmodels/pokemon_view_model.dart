@@ -11,10 +11,12 @@ class PokemonViewModel extends ChangeNotifier {
   bool isLoading = false;
 
   /// Carga Pokémon paginados desde la API o caché.
-  Future<void> loadPokemons({int offset = 0, int limit = 20}) async {
+  Future<void> loadPokemons({int offset = 0, int limit = 10}) async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
+
+    debugPrint('Cargando Pokémon desde ViewModel...');
 
     final result = await _pokemonService.getPokemons(offset, limit);
 

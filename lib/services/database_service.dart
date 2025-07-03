@@ -6,7 +6,6 @@ class DatabaseService {
   static const _dbName = 'pokemon_database.db';
   static const _dbVersion = 1;
   static const _tableName = 'pokemons';
-
   DatabaseService._privateConstructor();
   static final DatabaseService instance = DatabaseService._privateConstructor();
 
@@ -26,6 +25,7 @@ class DatabaseService {
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         imageUrl TEXT NOT NULL,
+         description TEXT,
         lastUpdated TEXT NOT NULL
       )
     ''');
@@ -51,13 +51,14 @@ class DatabaseService {
     return maps.map((map) => Pokemon.fromMap(map)).toList();
   }
 
-  Future<List<Pokemon>> searchPokemons(String query) async {
+  // Limpieza de caché antiguo
+  Future<void> clearOldCache({int days = 7}) async {
     final db = await instance.database;
-    final maps = await db.query(
+    final threshold = DateTime.now().subtract(Duration(days: days));
+    await db.delete(
       _tableName,
-      where: 'name LIKE ?',
-      whereArgs: ['%$query%'],
+      where: 'lastUpdated < ?',
+      whereArgs: [threshold.toIso8601String()],
     );
-    return maps.map((map) => Pokemon.fromMap(map)).toList();
   }
 }

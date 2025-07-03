@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/pokemon.dart';
 import '../utils/result.dart';
@@ -7,61 +6,60 @@ import '../utils/result.dart';
 class ApiService {
   static const String _baseUrl = 'https://pokeapi.co/api/v2';
 
-  /// Obtiene lista paginada de Pokémon básicos
+  /// Obtiene lista paginada de Pokémon completos (con descripción)
   Future<Result<List<Pokemon>>> fetchPokemons(int offset, int limit) async {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl/pokemon?offset=$offset&limit=$limit'),
       );
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final results = data['results'] as List;
-        final pokemons = results.asMap().entries.map((entry) {
-          final index = entry.key + offset + 1;
-          return Pokemon.fromJson(entry.value, index);
-        }).toList();
+
+        // Ejecuta todas las llamadas de detalle en paralelo
+        final futures = <Future<Pokemon>>[];
+
+        for (int i = 0; i < results.length; i++) {
+          final id = offset + i + 1;
+          futures.add(_fetchPokemonDetail(id));
+        }
+
+        final pokemons = await Future.wait(futures);
+
         return Success(pokemons);
-      } else {
-        return Failure(
-          'Error ${response.statusCode}: No se pudieron cargar los Pokémon',
-        );
       }
+
+      return Failure('Error al obtener pokemons');
     } catch (e) {
-      return Failure('Ocurrió un error inesperado: $e');
+      return Failure('Excepción al obtener pokemons: $e');
     }
   }
 
-  /// Obtiene el detalle completo de un Pokémon, incluyendo descripción
-  Future<Result<Pokemon>> fetchPokemonDetail(int id) async {
-    try {
-      final response = await http.get(Uri.parse('$_baseUrl/pokemon/$id'));
-      debugPrint('$_baseUrl/pokemon/$id');
-      if (response.statusCode != 200) {
-        return Failure('Error ${response.statusCode}');
-      }
+  /// Obtiene el detalle de un Pokémon (incluye nombre, imagen y descripción)
+  Future<Pokemon> _fetchPokemonDetail(int id) async {
+    final detailRes = await http.get(Uri.parse('$_baseUrl/pokemon/$id'));
+    final speciesRes = await http.get(
+      Uri.parse('$_baseUrl/pokemon-species/$id'),
+    );
 
-      final data = json.decode(response.body);
+    if (detailRes.statusCode == 200 && speciesRes.statusCode == 200) {
+      final detailJson = json.decode(detailRes.body);
+      final speciesJson = json.decode(speciesRes.body);
 
-      // Obtener URL del species para sacar la descripción
-      final speciesUrl = data['species']['url'];
-      final speciesResponse = await http.get(Uri.parse(speciesUrl));
-      debugPrint(speciesUrl);
-      String description = '';
-      if (speciesResponse.statusCode == 200) {
-        final speciesData = json.decode(speciesResponse.body);
-        final flavorEntry = (speciesData['flavor_text_entries'] as List)
-            .firstWhere(
-              (entry) => entry['language']['name'] == 'es',
-              orElse: () => {'flavor_text': 'Sin descripción disponible'},
-            );
-        description = flavorEntry['flavor_text'];
-      }
+      final flavorTextEntry = (speciesJson['flavor_text_entries'] as List)
+          .cast<Map<String, dynamic>>()
+          .firstWhere(
+            (entry) => entry['language']['name'] == 'es',
+            orElse: () => {'flavor_text': 'Sin descripción disponible'},
+          );
 
-      final pokemon = Pokemon.fromFullJson(data, description);
-      return Success(pokemon);
-    } catch (e) {
-      return Failure('Error al obtener detalle: $e');
+      final description = flavorTextEntry['flavor_text']
+          .replaceAll('\n', ' ')
+          .replaceAll('\f', ' ');
+
+      return Pokemon.fromFullJson(detailJson, description);
+    } else {
+      throw Exception('Error al obtener detalles del Pokémon $id');
     }
   }
 }
