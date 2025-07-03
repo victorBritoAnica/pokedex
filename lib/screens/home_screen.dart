@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   int _offset = 0; // Controla desde dónde pedir datos (paginación)
-  final int _limit = 20; // Cuántos elementos cargar por página
+  final int _limit = 10; // Cuántos elementos cargar por página
   String _searchQuery = ''; // Texto de búsqueda actual
   bool _hasLoadedInitialData = false; // Para evitar múltiples cargas iniciales
 
@@ -121,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.pushNamed(
                         context,
                         Routes.detail,
-                        arguments: pokemon,
+                        arguments: pokemon.id,
                       );
                     },
                   );

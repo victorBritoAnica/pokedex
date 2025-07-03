@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pokedex/models/pokemon.dart';
 import '../screens/splash_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/detail_screen.dart';
@@ -9,13 +8,13 @@ class AppRouter {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case Routes.splash:
-        return MaterialPageRoute(builder: (_) => SplashScreen());
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
       case Routes.home:
-        return MaterialPageRoute(builder: (_) => HomeScreen());
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
       case Routes.detail:
-        final pokemon = settings.arguments as Pokemon;
+        final pokemonId = settings.arguments as int;
         return MaterialPageRoute(
-          builder: (_) => DetailScreen(pokemon: pokemon),
+          builder: (_) => DetailScreen(pokemonId: pokemonId),
         );
       default:
         return MaterialPageRoute(
